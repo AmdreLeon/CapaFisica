@@ -40,18 +40,3 @@ class parser():
         return commands
 
 
-class cable():
-    def __init__(self,port1,port2):
-        self.port1 = port1
-        self.port2 = port2
-        self.status = "null"
-        
-class cumputer():
-    def __init__(self,name):
-        self.name = name
-        
-        
-class hub():
-    def __init__(self,name,c_ports):
-        self.name = name 
-        self.c_ports = c_ports
