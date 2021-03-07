@@ -37,24 +37,3 @@ def parser(file):
         current += 1
     return commands
 
-class cable():
-    def __init__(self,port1,port2):
-        port1 = port1
-        port2 = port2
-        status = "null"
-        
-class cumputer():
-    def __init__(self,name):
-        name = name
-        
-        
-class hub():
-    def __init__(self,name,c_ports):
-        name = name 
-        c_ports = c_ports
-
-a = hub("h",2)
-if type(a) is hub:
-    print(1)
-else: print(0)
-run()
