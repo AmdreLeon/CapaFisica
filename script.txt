@@ -1,0 +1,3 @@
+ <time> create host <name> 
+ <time> connect <port1> <port2> 
+ <time> create hub <name> <cantidad_de_puertos> 
