@@ -1,3 +1,4 @@
- <time> create host <name> 
- <time> connect <port1> <port2> 
- <time> create hub <name> <cantidad_de_puertos> 
+ 0 create host pc
+ 2 create host lap
+ 4 connect pc_1 lap_1
+ 20 send pc 00000000001111111111

@@ -1,0 +1,4 @@
+10 lap_1 receive null
+20 lap_1 receive null
+30 lap_1 receive 0
+40 lap_1 receive 1
