@@ -6,6 +6,7 @@ class System():
         self.network = Network()
         self.subnetworks = []
         self.globaltime = 0
+        self.signal_time = 10
         
     def create_hub(self,command):
         sn = SubNetwork([],len(self.subnetworks))
@@ -82,38 +83,39 @@ class System():
         commands = self.parser(file)
         file.close()
         file = open("config.txt","r")
-        signal_time = int(file.readline().split()[1])
+        self.signal_time = int(file.readline().split()[1])
         current = 0
         keep = 1
         while(len(commands) or keep):
             keep = 0 
-            if len(commands) and int(commands[current][0]) == self.globaltime:
-                if commands[current][1] == "create":
-                    if commands[current][2] == "hub":
-                        self.create_hub(commands[current])
+            while(len(commands) and int(commands[current][0]) == self.globaltime):
+                if len(commands) and int(commands[current][0]) == self.globaltime:
+                    if commands[current][1] == "create":
+                        if commands[current][2] == "hub":
+                            self.create_hub(commands[current])
+                            commands.pop(current)
+                        else: 
+                            self.create_host(commands[current])
+                            commands.pop(current)
+                    elif commands[current][1] == "connect":
+                        self.connect(commands[current])
                         commands.pop(current)
-                    else: 
-                        self.create_host(commands[current])
+                    elif commands[current][1] == "send":
+                        self.send(commands[current])
                         commands.pop(current)
-                elif commands[current][1] == "connect":
-                    self.connect(commands[current])
-                    commands.pop(current)
-                elif commands[current][1] == "send":
-                    self.send(commands[current])
-                    commands.pop(current)
-                else:
-                    self.disconnect(commands[current])
-                    commands.pop(current)
-                    
+                    else:
+                        self.disconnect(commands[current])
+                        commands.pop(current)
+
             for pc_hub in self.network.obtenerVertices():
                 if len(commands) == 0:
                     if type(pc_hub) is computer:
                         if len(pc_hub.process) >= 1:
                             keep = 1
 
-                if self.globaltime % signal_time == 0:
+                if self.globaltime % self.signal_time == 0:
                     pc_hub.print_status(self.globaltime)
-                pc_hub.update()
+                pc_hub.update(self.signal_time)
             for sn in self.subnetworks:
                 sn.update()
             self.globaltime +=1
@@ -145,13 +147,15 @@ class computer():
     #     else:
     #         self.my_subnetwork.status = self.process[self.current]
 
-    def update(self):
+    def update(self,sgntime):
         if self.status == "sending" and self.my_subnetwork.pc is self:
-            self.my_subnetwork.status = self.process[0][self.process_pointer-1]
-            if self.process_pointer == len(self.process[0]):
+            a = int((self.process_pointer-1) / sgntime)
+            self.my_subnetwork.status = self.process[0][a]
+            if (self.process_pointer / sgntime) == len(self.process[0]):
                 self.process.pop(0)
                 self.procces_pointer = 0
                 self.status = "receive"
+                self.my_subnetwork.pc = None
             else:
                 self.process_pointer += 1 
         else:
@@ -181,14 +185,14 @@ class hub():
         self.connected = [0 for i in range(0,c_ports)]
         self.status = "receive"
         self.my_subnetwork = my_subnetwork
-        self.my_file = open("./output/"+name+".txt","x")
+        self.my_file = open("./output/"+name+".txt","w")
         
     def print_status(self, globaltime):
         for port in range(0,self.c_ports):
             if self.connected[port]:
-                self.my_file.write(str(globaltime) + " " +  str(self.ports[0]) + " " + self.status + " " + self.my_subnetwork.status+'\n')  
+                self.my_file.write(str(globaltime) + " " +  str(self.ports[port]) + " " + self.status + " " + self.my_subnetwork.status+'\n')  
 
-    def update (self):
+    def update (self,sgntime):
         return
        
                      

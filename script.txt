@@ -1,4 +1,11 @@
  0 create host pc
  2 create host lap
- 4 connect pc_1 lap_1
- 20 send pc 00000000001111111111
+ 2 create hub hubito 4
+ 6 connect pc_1 hubito_1
+ 7 connect lap_1 hubito_2
+ 20 send pc 00000
+ 21 send lap 11
+ 24 create hub pelvis 3
+ 24 connect pelvis_1 hubito_3
+ 26 connect pelvis_3 hubito_4
+ 56 disconnect pc_1
