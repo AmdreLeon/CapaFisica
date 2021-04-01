@@ -13,10 +13,13 @@ python components.py myScript.txt
 Vale destacar que si no se agrega un nombre para el script el programa tomará el nombre "script.txt" por defecto.
 ## Instalación
 ***
-Para su uso solo es necesario tener el lenguaje de programación [Python](https://www.python.org/downloads) en con la versión 3.9.1 o mayor, que fue la usada por nosotros. 
+Para su uso solo es necesario tener el lenguaje de programación [Python](https://www.python.org/downloads) en con la versión 3.9.1 o mayor, que fue la usada por nosotros.
+El repositorio de GitHub es este [CapaFisica](https://github.com/Andrelenin42/CapaFisica)
+
 ## Desarrollado con
 ***
 * [VSCode](https://code.visualstudio.com)
+* [GitHub](https://github.com)
 * Muchas pero que muchas ganas
 ## Autores
 ***
