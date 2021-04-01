@@ -19,7 +19,7 @@ class Computer():
             self.my_subnetwork.status = self.process[0][a]
             if (self.process_pointer / sgntime) == len(self.process[0]):
                 self.process.pop(0)
-                self.procces_pointer = 0
+                self.process_pointer = 0
                 self.status = "receiving"
                 self.my_subnetwork.pc = None
             else:
