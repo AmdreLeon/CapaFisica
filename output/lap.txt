@@ -1,7 +1,0 @@
-10 lap_1 receive null
-20 lap_1 receive null
-30 lap_1 receive 0
-40 lap_1 receive 0
-50 lap_1 receive 0
-60 lap_1 sending 1
-70 lap_1 sending 1
