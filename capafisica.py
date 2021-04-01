@@ -10,26 +10,26 @@ class System():
         
     def create_hub(self,command):
         sn = SubNetwork([],len(self.subnetworks))
-        hub_ = hub(command[3],int(command[4]),sn)
+        hub_ = Hub(command[3],int(command[4]),sn)
         sn.devices_list.append(hub_)
         hub_.my_subnetwork = sn
-        self.network.agregarVertice(hub_)
+        self.network.add_vertex(hub_)
         self.subnetworks.append(sn)
         return hub_
         
     def create_host(self,command):
         sn = SubNetwork([],len(self.subnetworks))
-        computer_ = computer(command[3],int(command[0]),sn)
+        computer_ = Computer(command[3],int(command[0]),sn)
         sn.devices_list.append(computer_)
         computer_.my_subnetwork = sn
-        self.network.agregarVertice(computer_)
+        self.network.add_vertex(computer_)
         self.subnetworks.append(sn)
         return computer_
         
     def connect(self,command):
         a = None
         b = None
-        for i in self.network.obtenerVertices():
+        for i in self.network.get_vertex)l():
             for p in range(0,len(i.ports)):
                 if i.ports[p] == command[2] and not i.connected[p]:
                     a = i
@@ -40,30 +40,30 @@ class System():
                     i.connected[p] = 1
                     port2 = p
         if a and b:
-            self.network.agregarArista(a,b,(b.ports[port2],a.ports[port1]),(a.ports[port1],b.ports[port2]))
+            self.network.add_edge(a,b,(b.ports[port2],a.ports[port1]),(a.ports[port1],b.ports[port2]))
             DFS(self)  
             for sn in self.subnetworks:
                 sn.update()
         
     def disconnect(self,command):
         a = None
-        for i in self.network.obtenerVertices():
+        for i in self.network.get_vertex)l():
             for p in range(0,len(i.ports)):
                 if i.ports[p] == command[2] and i.connected[p]:
                     a = i
                     i.connected[p] = 0
                     break
-        for b in self.network.listaVertices[a].conectadoA:
+        for b in self.network.vertex_list[a].connected_to:
             if b[1] == command[2]:
-                self.network.listaVertices[a].conectadoA[b].id.connected[int(b[0][len(b[0])-1])-1] = 0
-                self.network.eliminarArista(a,self.network.listaVertices[a].conectadoA[b].id,b,(command[2],b[0]))
+                self.network.vertex_list[a].connected_to[b].id.connected[int(b[0][len(b[0])-1])-1] = 0
+                self.network.del_edge(a,self.network.vertex_list[a].connected_to[b].id,b,(command[2],b[0]))
                 break
         DFS(self)
         for sn in self.subnetworks:
             sn.update()
         
     def send(self,command):
-        for i in self.network.obtenerVertices():
+        for i in self.network.get_vertex)l():
             if i.name == command[2]:
                 pc_current = i
         pc_current.process.append(command[3])  
@@ -107,9 +107,9 @@ class System():
                         self.disconnect(commands[current])
                         commands.pop(current)
 
-            for pc_hub in self.network.obtenerVertices():
+            for pc_hub in self.network.get_vertex)l():
                 if len(commands) == 0:
-                    if type(pc_hub) is computer:
+                    if type(pc_hub) is Computer:
                         if len(pc_hub.process) >= 1:
                             keep = 1
 
@@ -120,13 +120,13 @@ class System():
                 sn.update()
             self.globaltime +=1
         
-        for i in self.network.obtenerVertices():
+        for i in self.network.get_vertex)l():
             i.my_file.close()
-        
-class computer():
+
+class Computer():
     def __init__(self,name,time,my_subnetwork):
         self.name = name
-        self.status = "receive"
+        self.status = "receiving"
         self.time = time
         self.ports = [name + "_1"]
         self.process = []
@@ -137,15 +137,6 @@ class computer():
         self.ready = 0
         self.t_sends = 0
         self.my_file = open("./output/"+name+".txt","w")
-            
-    # def sending(self,value):
-    #     # if self.t_sends > 16:
-    #     #     self.process.pop(0)
-    #     # else:
-    #     if self.my_subnetwork.status != "null" or self.my_subnetwork.pc is not self:
-    #         # self.t_sends += 1
-    #     else:
-    #         self.my_subnetwork.status = self.process[self.current]
 
     def update(self,sgntime):
         if self.status == "sending" and self.my_subnetwork.pc is self:
@@ -154,12 +145,12 @@ class computer():
             if (self.process_pointer / sgntime) == len(self.process[0]):
                 self.process.pop(0)
                 self.procces_pointer = 0
-                self.status = "receive"
+                self.status = "receiving"
                 self.my_subnetwork.pc = None
             else:
                 self.process_pointer += 1 
         else:
-            self.status = "receive"
+            self.status = "receiving"
 
         if len(self.process) == 0:
             self.ready = 0
@@ -170,20 +161,20 @@ class computer():
     def print_status(self,globaltime):
         self.my_file.write(str(globaltime) + " " +  str(self.ports[0]) + " " + self.status + " " + self.my_subnetwork.status+'\n')
 
-class cable():
+class Cable():
     def __init__(self,port1,port2):
         self.port1 = port1
         self.port2 = port2
         self.status = "null"
                 
-class hub():
+class Hub():
     def __init__(self,name,c_ports,my_subnetwork):
         self.name = name 
         self.c_ports = c_ports
         self.computers_list = []
         self.ports = [name + "_" + str(i) for i in range(1, c_ports + 1)]
         self.connected = [0 for i in range(0,c_ports)]
-        self.status = "receive"
+        self.status = "receiving"
         self.my_subnetwork = my_subnetwork
         self.my_file = open("./output/"+name+".txt","w")
         
@@ -194,8 +185,7 @@ class hub():
 
     def update (self,sgntime):
         return
-       
-                     
+                
 class SubNetwork():
     def __init__(self,devices_list,cc):
         self.devices_list = devices_list
@@ -206,7 +196,7 @@ class SubNetwork():
         
     def value(self):
         for comp in self.network:
-            if type(comp) is computer:
+            if type(comp) is Computer:
                 comp.sending()
     
     def update(self):
@@ -214,121 +204,103 @@ class SubNetwork():
             c.my_subnetwork = self
         if self.pc is None:
             for device in self.devices_list:
-                if type(device) is computer and device.ready:
+                if type(device) is Computer and device.ready:
                     self.pc = device
                     self.pc.status = "sending"
                     return
             self.status = "null"
                     
-
-        
-class Divice():
+class Device():
     def __init__(self,clave):
         self.id = clave
-        self.conectadoA = {}
+        self.connected_to = {}
         self.visited = 0
 
-    def agregarVecino(self,vecino,port):
-        self.conectadoA[port] = vecino
+    def add_neighbour(self,vecino,port):
+        self.connected_to[port] = vecino
 
-    def eliminarVecino(self,port):
-        del self.conectadoA[port]
+    def delete_neighbour(self,port):
+        del self.connected_to[port]
     
     def __str__(self):
-        return str(self.id) + ' conectadoA: ' + str([x.id for x in self.conectadoA])
+        return str(self.id) + ' connected to: ' + str([x.id for x in self.connected_to])
 
-    def obtenerConexiones(self):
-        return self.conectadoA.values()
+    def get_connections(self):
+        return self.connected_to.values()
 
-    def obtenerId(self):
+    def get_id(self):
         return self.id
-
-    #def obtenerPonderacion(self,vecino):
-    #    return self.conectadoA[vecino]
-    
+   
 class Network:
     def __init__(self):
-        self.listaVertices = {}
-        self.numVertices = 0
+        self.vertex_list = {}
+        self.num_vertex = 0
 
-    def agregarVertice(self,clave):
-        self.numVertices = self.numVertices + 1
-        nuevoVertice = Divice(clave)
-        self.listaVertices[clave] = nuevoVertice
-        return nuevoVertice
+    def add_vertex(self,clave):
+        self.num_vertex = self.num_vertex + 1
+        new_vertex = Device(clave)
+        self.vertex_list[clave] = new_vertex
+        return new_vertex
 
-    def obtenerVertice(self,n):
-        if n in self.listaVertices:
-            return self.listaVertices[n]
-        else:
-            return None
+    # def obtenerVertice(self,n):
+    #     if n in self.vertex_list:
+    #         return self.vertex_list[n]
+    #     else:
+    #         return None
 
     def __contains__(self,n):
-        return n in self.listaVertices
+        return n in self.vertex_list
 
-    def agregarArista(self,de,a,port1,port2):
+    def add_edge(self,from_,to,port1,port2):
         """
-        if de not in self.listaVertices:
-            nv = self.agregarVertice(de)
-        if a not in self.listaVertices:
-            nv = self.agregarVertice(a)
+        if from_ not in self.vertex_list:
+            nv = self.add_vertex(from)
+        if to not in self.vertex_list:
+            nv = self.add_vertex(to)
         """
-        self.listaVertices[de].agregarVecino(self.listaVertices[a], port1)
-        self.listaVertices[a].agregarVecino(self.listaVertices[de], port2)
+        self.vertex_list[from_].add_neighbour(self.vertex_list[to], port1)
+        self.vertex_list[to].add_neighbour(self.vertex_list[from_], port2)
         
-    def eliminarArista(self,de,a,port1,port2):
-        self.listaVertices[de].eliminarVecino(port1)
-        self.listaVertices[a].eliminarVecino(port2)
+    def del_edge(self,from_,to,port1,port2):
+        self.vertex_list[from_].delete_neighbour(port1)
+        self.vertex_list[to].delete_neighbour(port2)
         
-    def obtenerVertices(self):
-        return self.listaVertices.keys()
+    def get_vertex(self):
+        return self.vertex_list.keys()
 
     def __iter__(self):
-        return iter(self.listaVertices.values())
+        return iter(self.vertex_list.values())
  
 def DFS(system):
     system.subnetworks = []
     cc = 0
-    for vertex in system.network.obtenerVertices():
-        if not system.network.listaVertices[vertex].visited:
+    for vertex in system.network.get_vertex)l():
+        if not system.network.vertex_list[vertex].visited:
             system.subnetworks.append(SubNetwork(DFS_VISIT(system.network,vertex,[]),cc))
             vertex.subnetwork = system.subnetworks[cc]
             cc+=1
-    for vertex in system.network.listaVertices:
-        system.network.listaVertices[vertex].visited = 0
+    for vertex in system.network.vertex_list:
+        system.network.vertex_list[vertex].visited = 0
     return system.subnetworks
      
 def DFS_VISIT(graph, source,path = []):
-    (graph.listaVertices[source]).visited = 1
+    (graph.vertex_list[source]).visited = 1
     if source not in path:
         path.append(source)
         if source not in graph:
         # leaf node, backtrack
             return path
-        for neighbour in graph.listaVertices[source].obtenerConexiones():
+        for neighbour in graph.vertex_list[source].get_connections():
             if neighbour not in path:
                 path = DFS_VISIT(graph, neighbour.id, path)
     return path
 
-def randomGraph(graph):
-    lista = [graph.agregarVertice(rd.randint(0,100)) for i in range(0,50)]
-    for j in lista:
-        o = rd.randint(0,1)
-        if o:
-            graph.agregarArista(j.id,lista[rd.randint(0,49)].id)
+# def randomGraph(graph):
+#     my_list = [graph.add_vertex(rd.randint(0,100)) for i in range(0,50)]
+#     for j in my_list:
+#         o = rd.randint(0,1)
+#         if o:
+#             graph.add_edge(j.id,my_list[rd.randint(0,49)].id)
             
 S = System()
 S.run()
-print(1)
-"""
-a = Network()
-randomGraph(a)
-G = System()
-G.network = a
-ll = DFS(G)
-for i in ll:
-    print(i.network , i.id)
-print(["hub"+"_"+str(i) for i in range(1,8)])
-#a.agregarArista(22,1)
-#print(DFS(a))
-"""
