@@ -25,7 +25,7 @@ Equipo de desarrollo:
 * Andrés Alejandro León Almaguer C-312
 
 Equipo de apoyo:
-* Rachel Lambert Correoso
+* Rachel Lambert Correoso 
 * Y a todos aquellos que de alguna u otra forma brindaron su ayuda para que esto fuese posible
 
 ## A los profesores 
