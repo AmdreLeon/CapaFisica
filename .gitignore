@@ -1,2 +1,4 @@
 output/
 script.txt
+__pycache__/components.cpython-39.pyc
+*.txt

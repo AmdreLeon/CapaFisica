@@ -1,6 +1,8 @@
 import components as cm
 import random as rd
 import os
+import shutil as sh
+import sys
 
 
 class System():
@@ -84,12 +86,14 @@ class System():
             commands.append(line.split())
         return commands
 
-    def run(self):
-        file = open("script.txt", "r")
+    def run(self, script='script.txt'):
+        self.remove_txt()
+        file = open(script, "r")
         commands = self.parser(file)
         file.close()
         file = open("config.txt", "r")
         self.signal_time = int(file.readline().split()[1])
+        file.close()
         current = 0
         keep = 1
         while(len(commands) or keep):
@@ -129,6 +133,17 @@ class System():
         for i in self.network.get_vertex():
             i.my_file.close()
 
+    def remove_txt(self):
+        try:
+            os.chdir(os.path.join('.', 'output'))
+            for filename in os.listdir():
+                if filename.endswith('.txt'):
+                    os.unlink(filename)
+            os.chdir('..')
+            # print(os.getcwd())
+        except:
+            print('An exception occurred')
+
 
 def DFS(system):
     system.subnetworks = []
@@ -156,13 +171,10 @@ def DFS_VISIT(graph, source, path=[]):
                 path = DFS_VISIT(graph, neighbour.id, path)
     return path
 
-# def randomGraph(graph):
-#     my_list = [graph.add_vertex(rd.randint(0,100)) for i in range(0,50)]
-#     for j in my_list:
-#         o = rd.randint(0,1)
-#         if o:
-#             graph.add_edge(j.id,my_list[rd.randint(0,49)].id)
 
-
-S = System()
-S.run()
+if __name__ == "__main__":
+    S = System()
+    if len(sys.argv) > 1:
+        S.run(sys.argv[1])
+    else:
+        S.run()
