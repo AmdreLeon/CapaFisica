@@ -1,6 +1,7 @@
 class Computer():
     def __init__(self, name, time, my_subnetwork):
         self.name = name
+        self.mac_address = None
         self.status = "receiving"
         self.time = time
         self.ports = [name + "_1"]
@@ -12,6 +13,7 @@ class Computer():
         self.ready = 0
         self.t_sends = 0
         self.my_file = open("./output/"+name+".txt", "w")
+        self.my_frame_file = open("./output/"+name+"_data.txt", "w")
 
     def update(self, sgntime):
         if self.status == "sending" and self.my_subnetwork.pc is self:
@@ -35,7 +37,7 @@ class Computer():
 
     def print_status(self, globaltime):
         self.my_file.write(str(globaltime) + " " + str(
-            self.ports[0]) + " " + self.status + " " + self.my_subnetwork.status+'\n')
+            self.ports[0]) + " " + self.status + " " + self.my_subnetwork.status + '\n')
 
 
 class Cable():
@@ -60,11 +62,19 @@ class Hub():
         for port in range(0, self.c_ports):
             if self.connected[port]:
                 self.my_file.write(str(globaltime) + " " + str(
-                    self.ports[port]) + " " + self.status + " " + self.my_subnetwork.status+'\n')
+                    self.ports[port]) + " " + self.status + " " + self.my_subnetwork.status + '\n')
 
     def update(self, sgntime):
         return
-
+    
+# nuevo
+class Switch():
+    def __init__(self, name, c_ports, my_subnetwork):
+        self.name = name
+        self.c_ports = c_ports
+        self.ports = [name + "_" + str(i) for i in range(1, c_ports + 1)]
+        self.connected = [0 for i in range(0, c_ports)]
+        self.my_subnetwork = my_subnetwork
 
 class SubNetwork():
     def __init__(self, devices_list, cc):
@@ -73,11 +83,6 @@ class SubNetwork():
         self.id = cc
         self.status = "null"
         self.pc = None
-
-    def value(self):
-        for comp in self.network:
-            if type(comp) is Computer:
-                comp.sending()
 
     def update(self):
         for c in self.devices_list:
