@@ -217,8 +217,6 @@ def DFS_VISIT(graph, source, path=[]):
                 path = DFS_VISIT(graph, neighbour.id, path)
     return path
 
-<<<<<<< HEAD
-=======
 def hexa_bin(number,h_b):
     if h_b == "b":
         hexa_dec = hex(int(number, 2))[2:]
@@ -227,7 +225,6 @@ def hexa_bin(number,h_b):
         binary = bin(int(number, 16))[2:]
         return str(binary)
 
->>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
 if __name__ == "__main__":
     S = System()
     if len(sys.argv) > 1:
