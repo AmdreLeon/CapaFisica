@@ -9,6 +9,9 @@ class System():
     def __init__(self):
         self.network = cm.Network()
         self.subnetworks = []
+        self.hosts = []
+        self.hubs = []
+        self.switches = []
         self.globaltime = 0
         self.signal_time = 10
 
@@ -19,8 +22,13 @@ class System():
         hub_.my_subnetwork = sn
         self.network.add_vertex(hub_)
         self.subnetworks.append(sn)
+        self.hubs.append(hub_)
         return hub_
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
     def create_switch(self,command):
         sn = cm.SubNetwork([], len(self.subnetworks))
         switch_ = cm.Switch(command[3], int(command[4]), sn)
@@ -28,6 +36,10 @@ class System():
         switch_.my_subnetwork = sn
         self.network.add_vertex(switch_)
         self.subnetworks.append(sn)
+<<<<<<< HEAD
+=======
+        self.switches.append(switch_)
+>>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
         return switch_
     
     def create_host(self, command):
@@ -37,6 +49,7 @@ class System():
         computer_.my_subnetwork = sn
         self.network.add_vertex(computer_)
         self.subnetworks.append(sn)
+        self.hosts.append(computer_)
         return computer_
 
     def connect(self, command):
@@ -204,6 +217,17 @@ def DFS_VISIT(graph, source, path=[]):
                 path = DFS_VISIT(graph, neighbour.id, path)
     return path
 
+<<<<<<< HEAD
+=======
+def hexa_bin(number,h_b):
+    if h_b == "b":
+        hexa_dec = hex(int(number, 2))[2:]
+        return str(hexa_dec)
+    elif h_b == "h":
+        binary = bin(int(number, 16))[2:]
+        return str(binary)
+
+>>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
 if __name__ == "__main__":
     S = System()
     if len(sys.argv) > 1:

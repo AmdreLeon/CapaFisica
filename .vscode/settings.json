@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "python.pythonPath": "/bin/python",
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.enableExperiments": false,
@@ -6,4 +7,11 @@
     "npm.fetchOnlinePackageInfo": false,
     "git.autofetch": null,
     "telemetry.enableCrashReporter": false
+=======
+    "python.pythonPath": "C:\\Users\\manoly\\Anaconda3\\python.exe",
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": false,
+    "python.linting.pylamaEnabled": false,
+    "python.linting.mypyEnabled": true
+>>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
 }

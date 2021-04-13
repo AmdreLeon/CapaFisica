@@ -94,8 +94,7 @@ class SubNetwork():
                     self.pc.status = "sending"
                     return
             self.status = "null"
-
-
+            
 class Device():
     def __init__(self, clave):
         self.id = clave
