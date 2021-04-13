@@ -24,11 +24,8 @@ class System():
         self.subnetworks.append(sn)
         self.hubs.append(hub_)
         return hub_
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
+
     def create_switch(self,command):
         sn = cm.SubNetwork([], len(self.subnetworks))
         switch_ = cm.Switch(command[3], int(command[4]), sn)
@@ -36,10 +33,6 @@ class System():
         switch_.my_subnetwork = sn
         self.network.add_vertex(switch_)
         self.subnetworks.append(sn)
-<<<<<<< HEAD
-=======
-        self.switches.append(switch_)
->>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
         return switch_
     
     def create_host(self, command):
