@@ -1,3 +1,9 @@
 {
-    "python.pythonPath": "/usr/bin/python3"
+    "python.pythonPath": "/bin/python",
+    "workbench.settings.enableNaturalLanguageSearch": false,
+    "workbench.enableExperiments": false,
+    "json.schemaDownload.enable": false,
+    "npm.fetchOnlinePackageInfo": false,
+    "git.autofetch": null,
+    "telemetry.enableCrashReporter": false
 }

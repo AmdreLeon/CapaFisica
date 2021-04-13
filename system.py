@@ -21,6 +21,15 @@ class System():
         self.subnetworks.append(sn)
         return hub_
 
+    def create_switch(self,command):
+        sn = cm.SubNetwork([], len(self.subnetworks))
+        switch_ = cm.Switch(command[3], int(command[4]), sn)
+        sn.devices_list.append(switch_)
+        switch_.my_subnetwork = sn
+        self.network.add_vertex(switch_)
+        self.subnetworks.append(sn)
+        return switch_
+    
     def create_host(self, command):
         sn = cm.SubNetwork([], len(self.subnetworks))
         computer_ = cm.Computer(command[3], int(command[0]), sn)
@@ -77,6 +86,20 @@ class System():
         pc_current.ready = 1
         return pc_current
 
+    def send_frame(self,command):
+        for i in self.network.get_vertex():
+            if i.name == command[2]:
+                pc_current = i
+        pc_current.process.append(command[3])
+        pc_current.ready = 1
+        return pc_current
+    
+    def mac(self, command):
+        for pc in self.network.get_vertex():
+            if type(pc) is cm.Computer:
+                if pc.name == command[2]:
+                    pc.mac_address = command[3]
+    
     def parser(self, file):
         commands = []
         while True:
@@ -104,6 +127,9 @@ class System():
                         if commands[current][2] == "hub":
                             self.create_hub(commands[current])
                             commands.pop(current)
+                        elif commands[current][2] == "switch":
+                            self.create_switch(commands[current])
+                            commands.pop(current)
                         else:
                             self.create_host(commands[current])
                             commands.pop(current)
@@ -113,10 +139,15 @@ class System():
                     elif commands[current][1] == "send":
                         self.send(commands[current])
                         commands.pop(current)
+                    elif commands[current][1] == "send_frame":
+                        self.send_frame(commands[current])
+                        commands.pop(current)
+                    elif commands[current][1] == "mac":
+                        self.mac(commands[current])
+                        commands.pop(current)
                     else:
                         self.disconnect(commands[current])
                         commands.pop(current)
-
             for pc_hub in self.network.get_vertex():
                 if len(commands) == 0:
                     if type(pc_hub) is cm.Computer:
@@ -132,6 +163,8 @@ class System():
 
         for i in self.network.get_vertex():
             i.my_file.close()
+            if type(i) is cm.Computer:
+                i.my_frame_file.close()
 
     def remove_txt(self):
         try:
@@ -170,7 +203,6 @@ def DFS_VISIT(graph, source, path=[]):
             if neighbour not in path:
                 path = DFS_VISIT(graph, neighbour.id, path)
     return path
-
 
 if __name__ == "__main__":
     S = System()
