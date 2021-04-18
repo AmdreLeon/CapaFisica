@@ -1,17 +1,11 @@
 {
-<<<<<<< HEAD
-    "python.pythonPath": "/bin/python",
+    "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.enableExperiments": false,
     "json.schemaDownload.enable": false,
     "npm.fetchOnlinePackageInfo": false,
     "git.autofetch": null,
-    "telemetry.enableCrashReporter": false
-=======
-    "python.pythonPath": "C:\\Users\\manoly\\Anaconda3\\python.exe",
-    "python.linting.pylintEnabled": false,
-    "python.linting.enabled": false,
-    "python.linting.pylamaEnabled": false,
-    "python.linting.mypyEnabled": true
->>>>>>> fb1ebaa48d6228506234d5001976f0deb6cabbbe
+    "telemetry.enableCrashReporter": false,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

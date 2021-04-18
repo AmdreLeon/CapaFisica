@@ -1,4 +1,6 @@
 import components as cm
+from components import Hub, Network, Computer, Switch
+from functions import dfs, hexa_bin, complete
 import random as rd
 import os
 import shutil as sh
@@ -16,33 +18,18 @@ class System():
         self.signal_time = 10
 
     def create_hub(self, command):
-        sn = cm.SubNetwork([], len(self.subnetworks))
-        hub_ = cm.Hub(command[3], int(command[4]), sn)
-        sn.devices_list.append(hub_)
-        hub_.my_subnetwork = sn
-        self.network.add_vertex(hub_)
-        self.subnetworks.append(sn)
-        self.hubs.append(hub_)
+        hub_ = cm.Hub(command[3], int(command[4]))
+        self.hubs.append(self.network.add_vertex(hub_))
         return hub_
 
-
     def create_switch(self,command):
-        sn = cm.SubNetwork([], len(self.subnetworks))
-        switch_ = cm.Switch(command[3], int(command[4]), sn)
-        sn.devices_list.append(switch_)
-        switch_.my_subnetwork = sn
-        self.network.add_vertex(switch_)
-        self.subnetworks.append(sn)
+        switch_ = cm.Switch(command[3], int(command[4]),self.signal_time)
+        self.switches.append(self.network.add_vertex(switch_))
         return switch_
     
     def create_host(self, command):
-        sn = cm.SubNetwork([], len(self.subnetworks))
-        computer_ = cm.Computer(command[3], int(command[0]), sn)
-        sn.devices_list.append(computer_)
-        computer_.my_subnetwork = sn
-        self.network.add_vertex(computer_)
-        self.subnetworks.append(sn)
-        self.hosts.append(computer_)
+        computer_ = cm.Computer(command[3], self.signal_time)
+        self.hosts.append(self.network.add_vertex(computer_))
         return computer_
 
     def connect(self, command):
@@ -61,9 +48,6 @@ class System():
         if a and b:
             self.network.add_edge(
                 a, b, (b.ports[port2], a.ports[port1]), (a.ports[port1], b.ports[port2]))
-            DFS(self)
-            for sn in self.subnetworks:
-                sn.update()
 
     def disconnect(self, command):
         a = None
@@ -80,15 +64,18 @@ class System():
                 self.network.del_edge(
                     a, self.network.vertex_list[a].connected_to[b].id, b, (command[2], b[0]))
                 break
-        DFS(self)
-        for sn in self.subnetworks:
-            sn.update()
 
     def send(self, command):
         for i in self.network.get_vertex():
             if i.name == command[2]:
                 pc_current = i
-        pc_current.process.append(command[3])
+                break
+        mac_dir = '1111111111111111'
+        mac_ori = hexa_bin(pc_current.mac_address,'b')
+        data = complete(command[3],(8 - len(command[3])%8)+len(command[3]))
+        data_vol = complete(hexa_bin(str(int(len(data)/8)),'b'),8)
+        error = '00000000'
+        pc_current.process.append(mac_dir+mac_ori+data_vol+error+data)
         pc_current.ready = 1
         return pc_current
 
@@ -96,7 +83,12 @@ class System():
         for i in self.network.get_vertex():
             if i.name == command[2]:
                 pc_current = i
-        pc_current.process.append(command[3])
+        mac_dir = complete(hexa_bin(command[3],'b'),16)
+        mac_ori = complete(hexa_bin(command[4][0:4],'b'), 16)
+        data_vol = complete(hexa_bin(command[4][4:6],'b'),8)
+        error = complete(hexa_bin(command[4][6:8],'b'),8)
+        data = complete(hexa_bin(command[4][8:],'b'),int(data_vol,2)*8)
+        pc_current.process.append(mac_dir+mac_ori+data_vol+error+data)
         pc_current.ready = 1
         return pc_current
     
@@ -104,7 +96,7 @@ class System():
         for pc in self.network.get_vertex():
             if type(pc) is cm.Computer:
                 if pc.name == command[2]:
-                    pc.mac_address = command[3]
+                    pc.mac_address = (command[3]).lower()
     
     def parser(self, file):
         commands = []
@@ -154,20 +146,46 @@ class System():
                     else:
                         self.disconnect(commands[current])
                         commands.pop(current)
-            for pc_hub in self.network.get_vertex():
+            
+            for pc in [i for i in self.hosts]:
                 if len(commands) == 0:
-                    if type(pc_hub) is cm.Computer:
-                        if len(pc_hub.process) >= 1:
-                            keep = 1
+                    if len(pc.id.process) > 0:
+                        keep = 1
 
-                if self.globaltime % self.signal_time == 0:
-                    pc_hub.print_status(self.globaltime)
-                pc_hub.update(self.signal_time)
-            for sn in self.subnetworks:
-                sn.update()
+                if pc.id.ready and not dfs(pc, self.signal_time, self.globaltime):
+                    temp = self.hosts.index(pc)
+                    self.hosts.pop(temp)
+                    self.hosts.insert(0,pc)
+
+            for sw in self.switches:
+                if len(commands) == 0:
+                    for port in sw.id.ports_:
+                        if port.id.ready:
+                            keep = 1
+                
+                sw.id.update_sending()            
+                for port in sw.id.ports_: 
+                    if port.id.ready:
+                        dfs(port, self.signal_time, self.globaltime) 
+                
+            if self.globaltime % self.signal_time == 0:
+                for components in self.network.get_vertex():
+                    if not type(components) is Switch:
+                        components.print_status(self.globaltime)
+
+            for item in self.network.get_vertex():
+                if type(item) is Computer or type(item) is Hub:
+                    item.sending = 'null'
+                    item.receiving = 'null'
+                else:
+                    for ports in item.ports_:
+                        ports.send = 0
+                    
             self.globaltime += 1
 
         for i in self.network.get_vertex():
+            if type(i) is Switch:
+                continue
             i.my_file.close()
             if type(i) is cm.Computer:
                 i.my_frame_file.close()
@@ -179,45 +197,9 @@ class System():
                 if filename.endswith('.txt'):
                     os.unlink(filename)
             os.chdir('..')
-            # print(os.getcwd())
         except:
             print('An exception occurred')
-
-
-def DFS(system):
-    system.subnetworks = []
-    cc = 0
-    for vertex in system.network.get_vertex():
-        if not system.network.vertex_list[vertex].visited:
-            system.subnetworks.append(cm.SubNetwork(
-                DFS_VISIT(system.network, vertex, []), cc))
-            vertex.subnetwork = system.subnetworks[cc]
-            cc += 1
-    for vertex in system.network.vertex_list:
-        system.network.vertex_list[vertex].visited = 0
-    return system.subnetworks
-
-
-def DFS_VISIT(graph, source, path=[]):
-    (graph.vertex_list[source]).visited = 1
-    if source not in path:
-        path.append(source)
-        if source not in graph:
-            # leaf node, backtrack
-            return path
-        for neighbour in graph.vertex_list[source].get_connections():
-            if neighbour not in path:
-                path = DFS_VISIT(graph, neighbour.id, path)
-    return path
-
-def hexa_bin(number,h_b):
-    if h_b == "b":
-        hexa_dec = hex(int(number, 2))[2:]
-        return str(hexa_dec)
-    elif h_b == "h":
-        binary = bin(int(number, 16))[2:]
-        return str(binary)
-
+    
 if __name__ == "__main__":
     S = System()
     if len(sys.argv) > 1:
